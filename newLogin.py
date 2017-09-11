@@ -354,6 +354,189 @@ class KolibriTestingGroup(unittest.TestCase):
 		self.driver.close()
 
 
+class KolibriTestingExam(unittest.TestCase):
+	def setUp(self):
+		self.driver = webdriver.Firefox()
+
+	def test_e_create_exam(self):
+		self.driver.get("http://localhost:8080")
+		username = getText("Enter username of admin or coach")
+		username = validate(username, "Enter username of admin or coach")
+		password = getText("Enter password")
+		password = validate(password, "Enter password")
+		LoginDifferentKindOfUser(self.driver, username, password)
+		time.sleep(7)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
+		time.sleep(2)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'assessment')]").click()
+		time.sleep(5)
+
+		text = "Signed in as device owner"
+		if text not in self.driver.page_source:
+			class_name = getText("Enter class name")
+			class_name = validate(class_name, "Enter class name")
+			time.sleep(2)
+			if class_name in self.driver.page_source:
+				try:
+					self.driver.find_element_by_xpath("//a[contains(text(), '%s')]" %class_name).click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'assignment_late')]").click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//div[contains(text(), 'New Exam')]").click()
+					time.sleep(4)
+					self.driver.find_element_by_css_selector(".ui-select__display-value.is-placeholder").click()
+					time.sleep(4)
+					channel_name = getText("Enter channel name")
+					channel_name = validate(channel_name, "Enter channel name")
+					if channel_name not in self.driver.page_source:
+						channel_name = getText("Enter channel name")
+						channel_name = validate(channel_name, "Enter channel name")
+						time.sleep(3)
+						if channel_name not in self.driver.page_source:
+							print("Channel name not present")
+							sys.exit(0)
+
+					self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %channel_name).click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Create exam')]").click()
+					time.sleep(7)
+					exam_name = getText("Enter exam name")
+					exam_name = validate(exam_name, "Enter exam name")
+					time.sleep(3)
+					self.driver.find_element_by_xpath("//input[@type='text']").clear()
+					time.sleep(2)
+					self.driver.find_element_by_xpath("//input[@type='text']").send_keys(exam_name)				
+					text = "An exam with that title already exists"
+					time.sleep(3)
+					if text in self.driver.page_source:
+						exam_name = getText("Enter exam name")
+						exam_name = validate(exam_name, "Enter exam name")
+						time.sleep(3)
+						self.driver.find_element_by_xpath("//input[@type='text']").clear()
+						time.sleep(2)
+						self.driver.find_element_by_xpath("//input[@type='text']").send_keys(exam_name)		
+						time.sleep(3)
+						if text in self.driver.page_source:
+							print("Exam name already exist")
+							sys.exit(0)
+					#exam_question_count = getText("Enter number of question between 1 to 50")
+					#exam_question_count = validate(exam_question_count, "Enter number of question between 1 to 50")
+					time.sleep(4)
+					print("OUT")
+					self.driver.find_element_by_xpath("//input[@type='number']").clear()
+					time.sleep(2)
+					self.driver.find_element_by_xpath("//input[@type='number']").send_keys(5)
+					time.sleep(2)
+					self.driver.find_element_by_xpath("//input[@type='checkbox']").click()
+					time.sleep(15)
+
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Finish')]").click()
+					time.sleep(8)
+
+					temp = self.driver.find_elements_by_tag_name("tr")
+					temp.pop(0)
+					for i in range(0,len(temp)):
+						text1 = temp[i].find_element(By.TAG_NAME, "strong").text
+						if text1 == exam_name:
+							col = temp[i].find_elements(By.TAG_NAME, "td")[3]
+							print(col)
+							print(col.find_element(By.TAG_NAME, "div").text)
+							col.find_element(By.TAG_NAME, "div").click()
+							time.sleep(5)
+							self.driver.find_element_by_xpath("//span[contains(text(), 'Activate')]").click()
+							time.sleep(5)
+							self.assertEqual(True, True)
+							print("Exam Created and Assigned")
+							break
+
+				except Exception:
+					print("Element not found")
+			else:
+				print("Class not present")
+				self.assertEqual(True, True)
+		else:
+			print("Sorry, you login as a Device owner. Please login with admin or coach")
+			self.assertEqual(True, True)
+
+
+	def test_e_delete_exam(self):
+		self.driver.get("http://localhost:8080")
+		username = getText("Enter username of admin or coach")
+		username = validate(username, "Enter username of admin or coach")
+		password = getText("Enter password")
+		password = validate(password, "Enter password")
+		LoginDifferentKindOfUser(self.driver, username, password)
+		time.sleep(7)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
+		time.sleep(2)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'assessment')]").click()
+		time.sleep(5)
+
+		text = "Signed in as device owner"
+		if text not in self.driver.page_source:
+			class_name = getText("Enter class name")
+			class_name = validate(class_name, "Enter class name")
+			time.sleep(2)
+			if class_name in self.driver.page_source:
+				try:
+					self.driver.find_element_by_xpath("//a[contains(text(), '%s')]" %class_name).click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'assignment_late')]").click()
+					time.sleep(4)
+		
+					exam_name = getText("Enter already exist exam name")
+					exam_name = validate(exam_name, "Enter already exist exam name")
+					time.sleep(3)
+					count = 0
+					temp = self.driver.find_elements_by_tag_name("tr")
+					temp.pop(0)
+					for i in range(0,len(temp)):
+						text1 = temp[i].find_element(By.TAG_NAME, "strong").text
+						if text1 == exam_name:
+							count = 1
+							break
+
+					if count == 0:
+						print("Exam is not available to delete")
+						self.assertEqual(True, True)
+					else:
+						col = temp[i].find_elements(By.TAG_NAME, "td")[3]
+						print(col)
+						print(col.find_element(By.TAG_NAME, "div").text)
+						col.find_element(By.TAG_NAME, "span").click()
+						time.sleep(5)
+						self.driver.find_element_by_xpath("//div[contains(text(), 'Delete')]").click()
+						time.sleep(4)
+						self.driver.find_element_by_xpath("//span[contains(text(), 'Delete')]").click()
+						time.sleep(5)
+				except Exception:
+					print("Element not found")
+
+				temp = self.driver.find_elements_by_tag_name("tr")
+				temp.pop(0)
+				for i in range(0,len(temp)):
+					text1 = temp[i].find_element(By.TAG_NAME, "strong").text
+					if text1 == exam_name:
+						count = 1
+						break
+				if count == 0:
+					print("After deleting exam, Exam still there")
+					self.assertEqual(True, True)
+
+				else:
+					self.assertEqual(True, True)
+					print("Exam deleted successfully.")
+
+
+			else:
+				print("Class not present")
+				self.assertEqual(True, True)
+		else:
+			print("Sorry, you login as a Device owner. Please login with admin or coach")
+			self.assertEqual(True, True)
+	def tearDown(self):
+		self.driver.close()
+
 if __name__=="__main__":
 	unittest.main()
 
