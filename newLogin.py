@@ -1,4 +1,3 @@
-from selenium import webdriver
 import requests
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -6,6 +5,7 @@ from methods import *
 import unittest
 import time
 import sys
+import os
 from tkinter import *
 
 class KolibriTesting(unittest.TestCase):
@@ -278,16 +278,29 @@ class KolibriTestingGroup(unittest.TestCase):
 			try:
 				self.driver.find_element_by_xpath("//input[@type='checkbox']").click()
 				time.sleep(3)
-				self.driver.find_element_by_css_selector('.ui-button.koli-icon-button.right-margin.ui-button--type-primary.ui-button--color-primary.ui-button--icon-position-left.ui-button--size-small').click()
-				time.sleep(4)
-				self.driver.find_element_by_xpath("//label[contains(text(), '%s')]" %group_name).click()
-				time.sleep(4)
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Move')]").click()
-				time.sleep(4)
+				temp = self.driver.find_elements_by_class_name("group-section")
+				for i in temp:
+					text1 = i.find_element(By.TAG_NAME, "span").text
+					if text1 != "0 Learners":
+						i.find_element(By.TAG_NAME, "button").click()
+						time.sleep(4)
+						self.driver.find_element_by_xpath("//label[contains(text(), '%s')]" %group_name).click()
+						time.sleep(4)
+						self.driver.find_element_by_xpath("//span[contains(text(), 'Move')]").click()
+						time.sleep(4)
+						print("Learners added into new group")
+						
+						SignOut(self.driver)
+						self.assertEqual(True, True)
+
+						break
+				
 			except Exception:
 				print("There is no student in class")
+
 		else:
 			print("Enter valid classroom name")
+
 
 	def test_e_delete_group(self):
 		self.driver.get("http://localhost:8080")
@@ -312,41 +325,44 @@ class KolibriTestingGroup(unittest.TestCase):
 			btn = self.driver.find_elements_by_css_selector(".ui-icon.ui-button__dropdown-icon.material-icons")
 			group_name = getText("Enter group name to delete")
 			group_name = validate(group_name , "Enter group name to delete")
-			if group_name in self.driver.page_source:
-				temp = self.driver.find_elements_by_class_name("group-section")
-				count = 0
+			if group_name == "Ungrouped":
+				print("Sorry, You can not delete Ungrouped group")
+			else:
 				if group_name in self.driver.page_source:
-					for i in temp:
-						t = i.find_element(By.TAG_NAME, "h2").text
-						count = count +1
-						if t == group_name:
-							btn[count].click()
-							time.sleep(4)
-							self.driver.find_element_by_xpath("//div[contains(text(), 'Delete Group')]").click()
-							time.sleep(4)
-							self.driver.find_element_by_xpath("//span[contains(text(), 'Delete Group')]").click()
-							time.sleep(5)
-							temp = self.driver.find_elements_by_class_name("group-section")
-							break
-				if group_name in self.driver.page_source:
+					temp = self.driver.find_elements_by_class_name("group-section")
 					count = 0
-					for i in temp:
-						t = i.find_element(By.TAG_NAME, "h2").text
-						if t == group_name:
-							count =1
-							break
+					if group_name in self.driver.page_source:
+						for i in temp:
+							t = i.find_element(By.TAG_NAME, "h2").text
+							count = count +1
+							if t == group_name:
+								btn[count].click()
+								time.sleep(4)
+								self.driver.find_element_by_xpath("//div[contains(text(), 'Delete Group')]").click()
+								time.sleep(4)
+								self.driver.find_element_by_xpath("//span[contains(text(), 'Delete Group')]").click()
+								time.sleep(5)
+								temp = self.driver.find_elements_by_class_name("group-section")
+								break
+					if group_name in self.driver.page_source:
+						count = 0
+						for i in temp:
+							t = i.find_element(By.TAG_NAME, "h2").text
+							if t == group_name:
+								count =1
+								break
 
-					if count ==1:
+						if count == 0:
+							self.assertEqual(True, True)
+							print("Group deleted successfully")
+						else:
+							self.assertEqual(True , False)
+					else:
 						self.assertEqual(True, True)
 						print("Group deleted successfully")
-					else:
-						self.assertEqual(True , False)
 				else:
-					self.assertEqual(True, True)
-					print("Group deleted successfully")
-			else:
-				print("%s not present in the class" %group_name)
-				self.assertEqual(True , True)
+					print("%s not present in the class" %group_name)
+					self.assertEqual(True , True)
 		else:
 			print("Class is not present")
 
@@ -445,6 +461,7 @@ class KolibriTestingExam(unittest.TestCase):
 							time.sleep(5)
 							self.driver.find_element_by_xpath("//span[contains(text(), 'Activate')]").click()
 							time.sleep(5)
+							SignOut(self.driver)
 							self.assertEqual(True, True)
 							print("Exam Created and Assigned")
 							break
@@ -526,6 +543,7 @@ class KolibriTestingExam(unittest.TestCase):
 				else:
 					self.assertEqual(True, True)
 					print("Exam deleted successfully.")
+					SignOut(self.driver)
 
 
 			else:
@@ -537,8 +555,143 @@ class KolibriTestingExam(unittest.TestCase):
 	def tearDown(self):
 		self.driver.close()
 
+
+
+class KolibriTestingImportExport(unittest.TestCase):
+	def setUp(self):
+		self.driver = webdriver.Firefox()
+
+	def test_e_import_channel_from_internet(self):
+		self.driver.get("http://localhost:8080")
+		time.sleep(7)
+		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		time.sleep(8)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
+		time.sleep(4)
+		if "Kolibri selenium channel" in self.driver.page_source:
+			print("Already imported channel")
+		else:
+			time.sleep(3)
+			try:
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+				time.sleep(3)
+			except Exception:
+				pass
+			try:
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+				time.sleep(4)
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Internet')]").click()
+				time.sleep(4)
+				self.driver.find_element_by_xpath("//input[@type='text']").clear()
+				time.sleep(2)
+				self.driver.find_element_by_xpath("//input[@type='text']").send_keys('ec756d9428c64bdb909158326108464f')
+				time.sleep(2)
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+				time.sleep(15)
+				if "Finished!" in self.driver.page_source:
+					self.assertEqual(True, True)
+					print("Channel imported successfully")
+				else:
+					time.sleep(45)
+					if "Finished!" in self.driver.page_source:
+						self.assertEqual(True, True)
+						print("Channel imported successfully")
+					else:
+						print("You have very slow internet speed, Check import by your own")
+			except Exception:
+				print("Server is not responding")
+
+	def test_e_import_channel_from_localdrive(self):
+		self.driver.get("http://localhost:8080")
+		time.sleep(7)
+		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		time.sleep(8)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
+		time.sleep(4)
+		if "Kolibri selenium channel" in self.driver.page_source:
+			print("Already imported channel")
+		else:
+			print("Before")
+			try:
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+				time.sleep(3)
+			except Exception:
+				pass
+			try:
+				print("After")	
+				time.sleep(3)
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+				time.sleep(4)
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Local Drives')]").click()
+				time.sleep(4)
+				count = 0
+				path = getText("Enter path of local channel")
+				path = validate(path, "Enter path of local channel")
+				if path not in self.driver.page_source:
+					path = getText("Enter path of local channel")
+					path = validate(path, "Enter path of local channel")
+					if path not in self.driver.page_source:
+						print("Please Enter correct path or connect External drive to the server")
+					else:
+						count = 1
+				else: 
+					count = 1
+				print("Before")
+				if count == 1:
+					print("After")
+					self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %path).click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click() 
+					time.sleep(15)
+					if "Finished!" in self.driver.page_source:
+						print("Channel Imported successfully")
+						self.assertEqual(True, True)
+					else:
+						time.sleep(50)
+						if "Finished!" in self.driver.page_source:
+							print("Channel Imported successfully")
+							self.assertEqual(True, True)
+						else:
+							print("Please check this feature manually")
+							self.assertEqual(True, False)
+			except Exception:
+				print("Server is not responding")
+
+
+
+	def test_e_delete_channel(self):
+		self.driver.get("http://localhost:8080")
+		time.sleep(7)
+		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		time.sleep(8)
+		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
+		time.sleep(4)
+		if "Kolibri selenium channel" in self.driver.page_source:
+			temp = self.driver.find_elements_by_tag_name("tr")
+			temp.pop(0)
+			count = 0
+			for i in range(0,len(temp)):
+				text1 = temp[i].find_element(By.TAG_NAME, "td").text
+				if text1 == "Kolibri selenium channel":
+					col = temp[i].find_elements(By.TAG_NAME, "td")[4]
+					col.find_element(By.TAG_NAME, "button").click()
+					time.sleep(4)
+					self.driver.find_element_by_xpath("//div[contains(text(), 'Confirm')]").click()
+					time.sleep(5)
+					break
+			if "Kolibri selenium channel" in self.driver.page_source:
+				print("Channel delete feature not working properly")
+				self.assertEqual(True, False)
+			else:
+				self.assertEqual(True, True)
+				print("Channel Deleted successfully")
+		else:
+			print("Kolibri selenium channel is not present")
+			self.assertEqual(True, True)
+
+
+	def tearDown(self):
+		self.driver.close()
+
 if __name__=="__main__":
 	unittest.main()
-
-
-
