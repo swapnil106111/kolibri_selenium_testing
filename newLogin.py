@@ -17,7 +17,6 @@ user = [{"admin": "password"},
 class KolibriTesting(unittest.TestCase):
 	def setUp(self):
 		self.driver = webdriver.Firefox()
-		# self.driver = webdriver.Chrome()
 
 	def test_a_testing_server_is_started(self):
 		r = requests.get("http://localhost:8008")
@@ -30,10 +29,6 @@ class KolibriTesting(unittest.TestCase):
 	def test_b_create_users_and_login_with_exsting_user_with_wrong_password(self):
 		temp = sample(self.driver)
 		if temp==1:
-			user = getText("Enter existing username but not of learner user")
-			user = validate(user, "Enter existing username but not of learner user")
-			password = getText("Enter Incorrect password")
-			password = validate(user, "Enter Incorrect password")
 			text = LoginDifferentKindOfUser(self.driver, "coach", "password")
 			self.assertEqual(text, "Incorrect username or password",'Logging with the user that is not part of class')
 
@@ -49,9 +44,7 @@ class KolibriTesting(unittest.TestCase):
 	
 	def test_e_login_with_non_exsting_user(self):
 		self.driver.get("http://localhost:8008")
-		text1 = getText("Enter existing username")
-		text1 = validate(text1, "Enter existing username")
-		text = LoginDifferentKindOfUser(self.driver, text1, "lee")
+		text = LoginDifferentKindOfUser(self.driver, "nalanda","lee")
 		self.assertEqual(text, "Incorrect username or password",'Logging with the user that is not part of class')
 	
 	def tearDown(self):
@@ -61,7 +54,6 @@ class KolibriTesting(unittest.TestCase):
 class KolibriTestingClass(unittest.TestCase):
 	def setUp(self):
 		self.driver = webdriver.Firefox()
-		# self.driver = webdriver.Chrome()
 
 	def test_a_delete_class(self):
 		self.driver.get("http://localhost:8008")
@@ -98,7 +90,6 @@ class KolibriTestingClass(unittest.TestCase):
 class KolibriTestingFacility(unittest.TestCase):
 	def setUp(self):
 		self.driver = webdriver.Firefox()
-		#self.driver = webdriver.Chrome()
 
 	def test_a_check_edit_username_facility(self):
 		self.driver.get("http://localhost:8008")
@@ -127,7 +118,7 @@ class KolibriTestingFacility(unittest.TestCase):
 
 		self.driver.find_element_by_xpath("//input[@type='text']").clear()
 		time.sleep(3)
-		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[4].keys(0))
+		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[4].keys()[0])
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'Save changes')]").click()
 		time.sleep(4)
@@ -145,7 +136,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'exit_to_app')]").click()
 		time.sleep(5)
-		LoginDifferentKindOfUser(self.driver, user[4].keys(0), user[4].values(0))
+		LoginDifferentKindOfUser(self.driver, user[4].keys()[0], user[4].values()[0])
 		time.sleep(8)
 		temp = self.driver.title
 		self.assertTrue(True, "Learn" in temp)
@@ -155,8 +146,10 @@ class KolibriTestingFacility(unittest.TestCase):
 		self.driver.find_element_by_xpath('//span[contains(text(), "menu")]').click()
 		time.sleep(4)
 		self.driver.find_element_by_xpath('//div[contains(text(), "Profile")]').click()
+		time.sleep(2)
+		self.driver.find_element_by_xpath("//input[@type='text']").clear()
 		time.sleep(4)
-		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[3].keys(0))
+		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[3].keys()[0])
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'Save changes')]").click()
 		time.sleep(4)
@@ -184,9 +177,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		SignOut(self.driver)
 		time.sleep(4)
 		try:
-			username = getText("Enter new username which is exist")
-			username = validate(username, "Enter new username which is exist")
-			LoginDifferentKindOfUser(self.driver, username,"sc")
+			LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0])
 			time.sleep(5)
 			self.driver.find_element_by_xpath("//button[@type='submit']").click()
 			time.sleep(2)
@@ -230,7 +221,6 @@ class KolibriTestingFacility(unittest.TestCase):
 class KolibriTestingGroup(unittest.TestCase):
 	def setUp(self):
 		self.driver = webdriver.Firefox()
-		#self.driver = webdriver.Chrome()
 
 	def test_a_create_group(self):
 		self.driver.get("http://localhost:8008")
@@ -536,20 +526,25 @@ class KolibriTestingExam(unittest.TestCase):
 					print("Element not found")
 
 				temp = self.driver.find_elements_by_tag_name("tr")
-				temp.pop(0)
-				for i in range(0,len(temp)):
-					text1 = temp[i].find_element(By.TAG_NAME, "strong").text
-					if text1 == exam_name:
-						count = 1
-						break
-				if count == 0:
-					print("After deleting exam, Exam still there")
-					self.assertEqual(True, True)
+				if len(temp) != 0:
+					temp.pop(0)
+					for i in range(0,len(temp)):
+						text1 = temp[i].find_element(By.TAG_NAME, "strong").text
+						if text1 == exam_name:
+							count = 1
+							break
+					if count == 0:
+						print("After deleting exam, Exam still there")
+						self.assertEqual(True, True)
 
+					else:
+						self.assertEqual(True, True)
+						print("Exam deleted successfully.")
+						SignOut(self.driver)
 				else:
-					self.assertEqual(True, True)
-					print("Exam deleted successfully.")
-					SignOut(self.driver)
+						self.assertEqual(True, True)
+						print("Exam deleted successfully.")
+						SignOut(self.driver)
 
 
 			else:
@@ -574,43 +569,46 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
-		if "Kolibri selenium channel" in self.driver.page_source:
-			print("Already imported channel")
-		else:
+		try:
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 			time.sleep(3)
-			try:
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
-				time.sleep(3)
-			except Exception:
-				pass
-			try:
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
-				time.sleep(4)
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Internet')]").click()
-				time.sleep(4)
-				self.driver.find_element_by_xpath("//input[@type='text']").clear()
-				time.sleep(2)
-				self.driver.find_element_by_xpath("//input[@type='text']").send_keys('ec756d9428c64bdb909158326108464f')
-				time.sleep(2)
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
-				time.sleep(5)
-				if "That ID was not found on our server." in self.driver.page_source:
-					print("Your channel ID is not valid")
-					self.assertEqual(False, False)
+		except Exception:
+			pass
+		try:
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+			time.sleep(4)
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Internet')]").click()
+			time.sleep(4)
+			self.driver.find_element_by_xpath("//input[@type='text']").clear()
+			time.sleep(2)
+			channel_id = getText("Enter channel ID which you want to import from internet")
+			channel_id = validate(channel_id, "Enter channel ID which you want to import from internet")
+			time.sleep(2)
+			self.driver.find_element_by_xpath("//input[@type='text']").send_keys(channel_id)
+			time.sleep(2)
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+			time.sleep(5)
+			if "That ID was not found on our server." in self.driver.page_source:
+				print("Your channel ID is not valid")
+				self.assertEqual(False, False)
+			else:
+				time.sleep(15)
+				if "Finished!" in self.driver.page_source:
+					self.assertEqual(True, True)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+					time.sleep(2)
+					print("Channel imported successfully")
 				else:
-					time.sleep(15)
+					time.sleep(45)
 					if "Finished!" in self.driver.page_source:
 						self.assertEqual(True, True)
+						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+						time.sleep(2)
 						print("Channel imported successfully")
 					else:
-						time.sleep(45)
-						if "Finished!" in self.driver.page_source:
-							self.assertEqual(True, True)
-							print("Channel imported successfully")
-						else:
-							print("You have very slow internet speed, Check import by your own")
-			except Exception:
-				print("Server is not responding")
+						print("You have very slow internet speed, Check import by your own")
+		except Exception:
+			print("Server is not responding")
 
 	def test_b_import_channel_from_localdrive(self):
 		self.driver.get("http://localhost:8008")
@@ -619,50 +617,54 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
-		if "Kolibri selenium channel" in self.driver.page_source:
-			print("Already imported channel")
-		else:
-			try:
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
-				time.sleep(3)
-			except Exception:
-				pass
-			try:
-				time.sleep(3)
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
-				time.sleep(4)
-				self.driver.find_element_by_xpath("//span[contains(text(), 'Local Drives')]").click()
-				time.sleep(4)
-				count = 0
+
+		try:
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+			time.sleep(3)
+		except Exception:
+			pass
+		try:
+			time.sleep(3)
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click()
+			time.sleep(4)
+			self.driver.find_element_by_xpath("//span[contains(text(), 'Local Drives')]").click()
+			time.sleep(4)
+			count = 0
+			path = getText("Enter path of local channel")
+			path = validate(path, "Enter path of local channel")
+			if path not in self.driver.page_source:
 				path = getText("Enter path of local channel")
 				path = validate(path, "Enter path of local channel")
 				if path not in self.driver.page_source:
-					path = getText("Enter path of local channel")
-					path = validate(path, "Enter path of local channel")
-					if path not in self.driver.page_source:
-						print("Please Enter correct path or connect External drive to the server")
-					else:
-						count = 1
-				else: 
+					print("Please Enter correct path or connect External drive to the server")
+				else:
 					count = 1
-				if count == 1:
-					self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %path).click()
-					time.sleep(4)
-					self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click() 
-					time.sleep(15)
+			else: 
+				count = 1
+			if count == 1:
+				self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %path).click()
+				time.sleep(4)
+				self.driver.find_element_by_xpath("//span[contains(text(), 'Import')]").click() 
+				time.sleep(15)
+				if "Finished!" in self.driver.page_source:
+					print("Channel Imported successfully")
+					time.sleep(2)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+					time.sleep(2)
+					self.assertEqual(True, True)
+				else:
+					time.sleep(50)
 					if "Finished!" in self.driver.page_source:
 						print("Channel Imported successfully")
+						time.sleep(2)
+						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+						time.sleep(2)
 						self.assertEqual(True, True)
 					else:
-						time.sleep(50)
-						if "Finished!" in self.driver.page_source:
-							print("Channel Imported successfully")
-							self.assertEqual(True, True)
-						else:
-							print("Please check this feature manually")
-							self.assertEqual(True, False)
-			except Exception:
-				print("Server is not responding")
+						print("Please check this feature manually")
+						self.assertEqual(True, False)
+		except Exception:
+			print("Server is not responding")
 
 	def test_c_export_channel_to_localdrive(self):
 		self.driver.get("http://localhost:8008")
@@ -671,7 +673,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
-		if "Kolibri selenium channel" in self.driver.page_source:
+		if "No channels installed" in self.driver.page_source:
+			print("No channels installed in your system")
+		else:
 			try:
 				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 				time.sleep(3)
@@ -699,11 +703,13 @@ class KolibriTestingImportExport(unittest.TestCase):
 					self.driver.find_element_by_xpath("//span[contains(text(), 'Export')]").click() 
 					time.sleep(15)
 					if "Finished!" in self.driver.page_source:
+						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 						print("Channel Exported successfully")
 						self.assertEqual(True, True)
 					else:
 						time.sleep(50)
 						if "Finished!" in self.driver.page_source:
+							self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 							print("Channel Exported successfully")
 							self.assertEqual(True, True)
 						else:
@@ -711,8 +717,6 @@ class KolibriTestingImportExport(unittest.TestCase):
 							self.assertEqual(True, False)
 			except Exception:
 				print("Server is not responding")			
-		else:
-			print("Kolibri selenium channel is not imported")
 
 	def test_d_delete_channel(self):
 		self.driver.get("http://localhost:8008")
@@ -721,28 +725,33 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
-		if "Kolibri selenium channel" in self.driver.page_source:
-			temp = self.driver.find_elements_by_tag_name("tr")
-			temp.pop(0)
-			count = 0
-			for i in range(0,len(temp)):
-				text1 = temp[i].find_element(By.TAG_NAME, "td").text
-				if text1 == "Kolibri selenium channel":
-					col = temp[i].find_elements(By.TAG_NAME, "td")[4]
-					col.find_element(By.TAG_NAME, "button").click()
-					time.sleep(4)
-					self.driver.find_element_by_xpath("//div[contains(text(), 'Confirm')]").click()
-					time.sleep(5)
-					break
-			if "Kolibri selenium channel" in self.driver.page_source:
-				print("Channel delete feature not working properly")
-				self.assertEqual(True, False)
-			else:
-				self.assertEqual(True, True)
-				print("Channel Deleted successfully")
+		if "No channels installed" in self.driver.page_source:
+			print("No channels installed in your system")
 		else:
-			print("Kolibri selenium channel is not present")
-			self.assertEqual(True, True)
+			channel_name = getText("Enter channel name")
+			channel_name = validate(channel_name, "Enter channel name")
+			if channel_name in self.driver.page_source:
+				temp = self.driver.find_elements_by_tag_name("tr")
+				temp.pop(0)
+				count = 0
+				for i in range(0,len(temp)):
+					text1 = temp[i].find_element(By.TAG_NAME, "td").text
+					if text1 == channel_name:
+						col = temp[i].find_elements(By.TAG_NAME, "td")[4]
+						col.find_element(By.TAG_NAME, "button").click()
+						time.sleep(4)
+						self.driver.find_element_by_xpath("//div[contains(text(), 'Confirm')]").click()
+						time.sleep(5)
+						break
+				if channel_name in self.driver.page_source:
+					print("Channel delete feature is not working properly")
+					self.assertEqual(True, False)
+				else:
+					self.assertEqual(True, True)
+					print("Channel Deleted successfully")
+			else:
+				print("%s is not present" %channel_name)
+				self.assertEqual(True, True)
 
 	def tearDown(self):
 		self.driver.close()
