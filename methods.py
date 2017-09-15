@@ -3,10 +3,16 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from tkinter import *
 
-def CreateDeviceOwnerAccount(driver, user, ps, name):
+user = [{"admin": "password"},
+		{"pm": "sc"},
+		{"coach": "sc"},
+		{"learner":"sc"},
+		{"student": "sc"}]
+
+def CreateDeviceOwnerAccount(driver, username, ps, name):
 	driver.find_element_by_xpath("//input[@type='text']").clear()
 	time.sleep(1)
-	driver.find_element_by_xpath("//input[@type='text']").send_keys(user)
+	driver.find_element_by_xpath("//input[@type='text']").send_keys(username)
 	time.sleep(1)
 	driver.find_element_by_xpath("//input[@type='password']").clear()
 	time.sleep(1)
@@ -45,28 +51,15 @@ def CreateDeviceOwnerAccount(driver, user, ps, name):
 	time.sleep(8)
 	driver.find_element_by_xpath('//span[contains(text(), "Create")]').click()
 	time.sleep(2)
-	driver.find_element_by_xpath('//a[contains(text(), "%s")]' %text1).click()
+	driver.find_element_by_xpath("//a[contains(text(), '%s')]" %text1).click()
 	time.sleep(2)
 	driver.find_element_by_xpath('//span[contains(text(), "Enroll users")]').click()
 	time.sleep(2)
-	text = getText("Enter username of learner")
-	text = validate(text, "Enter username of learner")
-	text1 = getText("Enter password for learner")
-	text1 = validate(text1, "Enter password for learner")
-
-	CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
+	CreateUserAccount(driver, user[3].keys()[0], user[3].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
 	time.sleep(2)
-	text = getText("Enter username of coach")
-	text = validate(text, "Enter username of coach")
-	text1 = getText("Enter password for coach")
-	text1 = validate(text1, "Enter password of coach")
-	CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
+	CreateUserAccount(driver, user[2].keys()[0], user[2].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
 	time.sleep(2)
-	text = getText("Enter username of admin")
-	text = validate(text, "Enter username of admin")
-	text1 = getText("Enter password for admin")
-	text1 = validate(text1, "Enter password of admin")
-	CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
+	CreateUserAccount(driver, user[1].keys()[0], user[1].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
 	time.sleep(3)
 	driver.find_element_by_xpath('//span[contains(text(), "Review & save")]').click()
 	time.sleep(2)
@@ -140,9 +133,6 @@ def LoginDifferentKindOfUser(driver, user, password):
 		if text in driver.page_source:
 			return text
 
-
-
-
 def SignOut(driver):
 	driver.find_element_by_xpath("//button[@type='submit']").click()
 	time.sleep(2)
@@ -156,7 +146,7 @@ def sample(driver):
 	try:
 		#print(driver.current_url)
 		if "setup_wizard" not in driver.current_url:
-			LoginDifferentKindOfUser(driver, "admin", "password")
+			LoginDifferentKindOfUser(driver, user[0].keys()[0], user[0].values()[0])
 			time.sleep(1)
 			driver.find_element_by_xpath('//a[contains(@href,"#/classes")]').click()
 			time.sleep(2)
@@ -184,23 +174,11 @@ def sample(driver):
 			time.sleep(2)
 			driver.find_element_by_xpath('//span[contains(text(), "Enroll users")]').click()
 			time.sleep(2)
-			text = getText("Enter username for learner")
-			text = validate(text, "Enter username of learner")
-			text1 = getText("Enter password for learner")
-			text1 = validate(text1, "Enter password of learner")
-			CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
+			CreateUserAccount(driver, user[3].keys()[0], user[3].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
 			time.sleep(2)
-			text = getText("Enter username for coach")
-			text = validate(text, "Enter username of coach")
-			text1 = getText("Enter password for coach")
-			text1 = validate(text1, "Enter password of coach")
-			CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
+			CreateUserAccount(driver, user[2].keys()[0], user[2].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
 			time.sleep(2)
-			text = getText("Enter username for admin")
-			text = validate(text, "Enter username of admin")
-			text1 = getText("Enter password for admin")
-			text1 = validate(text1, "Enter password of admin")
-			CreateUserAccount(driver, text, text1, "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
+			CreateUserAccount(driver, user[1].keys()[0], user[1].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
 			time.sleep(3)
 			if "Select all on page" in driver.page_source:
 				driver.find_element_by_name("Select all on page").click()
@@ -221,7 +199,7 @@ def sample(driver):
 
 		else:
 			text = getText("Enter Facility name::")
-			CreateDeviceOwnerAccount(driver, "admin", "password", text)
+			CreateDeviceOwnerAccount(driver, user[0].keys()[0], user[0].values()[0], text)
 
 		return 1
 	except Exception :
