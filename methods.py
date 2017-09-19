@@ -2,14 +2,13 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from tkinter import *
+import openpyxl
 
-user = [{"admin": "password"},
-		{"pm": "sc"},
-		{"coach": "sc"},
-		{"learner":"sc"},
-		{"student": "sc"}]
 
 def CreateDeviceOwnerAccount(driver, username, ps, name):
+	wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+	sheet_user = wb.get_sheet_by_name('user')
+	#LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 	driver.find_element_by_xpath("//input[@type='text']").clear()
 	time.sleep(1)
 	driver.find_element_by_xpath("//input[@type='text']").send_keys(username)
@@ -44,22 +43,19 @@ def CreateDeviceOwnerAccount(driver, username, ps, name):
 	time.sleep(2)
 	driver.find_element_by_xpath('//span[contains(text(), "Add New Class")]').click() 
 	time.sleep(2)
-	text1 = getText("Enter Classroom name")
-	text1 = validate(text1, "Enter Classroom name")
-	time.sleep(1)
-	driver.find_element_by_xpath("//input[@type='text']").send_keys(text1)
+	driver.find_element_by_xpath("//input[@type='text']").send_keys(str(sheet_user['D2'].value))
 	time.sleep(8)
 	driver.find_element_by_xpath('//span[contains(text(), "Create")]').click()
 	time.sleep(2)
-	driver.find_element_by_xpath("//a[contains(text(), '%s')]" %text1).click()
+	driver.find_element_by_xpath("//a[contains(text(), '%s')]" %str(sheet_user['D2'].value)).click()
 	time.sleep(2)
 	driver.find_element_by_xpath('//span[contains(text(), "Enroll users")]').click()
 	time.sleep(2)
-	CreateUserAccount(driver, user[3].keys()[0], user[3].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
+	CreateUserAccount(driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
 	time.sleep(2)
-	CreateUserAccount(driver, user[2].keys()[0], user[2].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
+	CreateUserAccount(driver, str(sheet_user['A4'].value), str(sheet_user['B4'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
 	time.sleep(2)
-	CreateUserAccount(driver, user[1].keys()[0], user[1].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
+	CreateUserAccount(driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
 	time.sleep(3)
 	driver.find_element_by_xpath('//span[contains(text(), "Review & save")]').click()
 	time.sleep(2)
@@ -82,12 +78,6 @@ def CreateUserAccount(driver, user, ps, link):
    	time.sleep(1)
    	text = "Username already exists"
    	if text in driver.page_source:
-   		time.sleep(2)
-   		#webdriver.ActionChains(driver).send_keys(Keys.ESCAPE).perform()
-   		user = getText("Enter username")
-   		driver.find_element_by_xpath("(//input[@type='text'])[2]").clear()
-   		time.sleep(2)
-   		driver.find_element_by_xpath("(//input[@type='text'])[2]").send_keys(user)
    		time.sleep(2)
    		if text in driver.page_source:
    			webdriver.ActionChains(driver).send_keys(Keys.ESCAPE).perform()
@@ -141,28 +131,30 @@ def SignOut(driver):
 
 def sample(driver):
 	driver.get("http://localhost:8008")
+	wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+	sheet_user = wb.get_sheet_by_name('user')
 	assert "Kolibri" in driver.title
 	time.sleep(2)
 	try:
 		#print(driver.current_url)
 		if "setup_wizard" not in driver.current_url:
-			LoginDifferentKindOfUser(driver, user[0].keys()[0], user[0].values()[0])
+			print("AAA")
+			LoginDifferentKindOfUser(driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 			time.sleep(1)
 			driver.find_element_by_xpath('//a[contains(@href,"#/classes")]').click()
 			time.sleep(2)
 			driver.find_element_by_xpath('//span[contains(text(), "Add New Class")]').click() 
 			time.sleep(2)
-			class_name = getText("Enter Classname")
-			driver.find_element_by_xpath("//input[@type='text']").send_keys(class_name)
+			class_name = str(sheet_user['E2'].value)
+			driver.find_element_by_xpath("//input[@type='text']").send_keys(str(sheet_user['E2'].value))
 			time.sleep(2)
 			text = "A class with that name already exists"
 			if text in driver.page_source:
 				time.sleep(2)
-				class_name = getText("Enter Classname")
+				class_name = str(sheet_user['F2'].value)
 				driver.find_element_by_xpath("//input[@type='text']").clear()
 				time.sleep(2)
-				driver.find_element_by_xpath("//input[@type='text']").send_keys(class_name)
-				#webdriver.ActionChains(driver).send_keys(Keys.ESCAPE).perform()
+				driver.find_element_by_xpath("//input[@type='text']").send_keys(str(sheet_user['F2'].value))
 				time.sleep(3)
 				driver.find_element_by_xpath('//span[contains(text(), "Create")]').click()
 				time.sleep(2)
@@ -174,11 +166,11 @@ def sample(driver):
 			time.sleep(2)
 			driver.find_element_by_xpath('//span[contains(text(), "Enroll users")]').click()
 			time.sleep(2)
-			CreateUserAccount(driver, user[3].keys()[0], user[3].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
+			CreateUserAccount(driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[1]")
 			time.sleep(2)
-			CreateUserAccount(driver, user[2].keys()[0], user[2].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
+			CreateUserAccount(driver, str(sheet_user['A4'].value), str(sheet_user['B4'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[2]")
 			time.sleep(2)
-			CreateUserAccount(driver, user[1].keys()[0], user[1].values()[0], "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
+			CreateUserAccount(driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value), "//div[@id='modal-window']/div/form/section/div[5]/div/div/div[3]/ul/li[3]")
 			time.sleep(3)
 			if "Select all on page" in driver.page_source:
 				driver.find_element_by_name("Select all on page").click()
@@ -198,8 +190,7 @@ def sample(driver):
 
 
 		else:
-			text = getText("Enter Facility name::")
-			CreateDeviceOwnerAccount(driver, user[0].keys()[0], user[0].values()[0], text)
+			CreateDeviceOwnerAccount(driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value), str(sheet_user['c2'].value))
 
 		return 1
 	except Exception :
