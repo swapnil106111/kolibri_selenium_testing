@@ -8,7 +8,11 @@ import sys
 import os
 from tkinter import *
 import openpyxl
-
+from time import gmtime, strftime
+file = open("selenium.log", "a")
+file.write("\n\n")
+file.write(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+file.write("\n")
 
 
 class KolibriTesting(unittest.TestCase):
@@ -19,31 +23,47 @@ class KolibriTesting(unittest.TestCase):
 		r = requests.get("http://localhost:8008")
 		if r.status_code == 200:
 			print("Kolibri Server is started")
+			file.write("\n")
+			file.write("test_a_testing_server_is_started is passed")
+			file.write("\n")
 		else:
 			print("Server Error %s" %r.status_code)
+			file.write("\n")
+			file.write("test_a_testing_server_is_started is failed")
+			file.write("\n")
 		self.assertEqual(r.status_code, 200)
 
 	def test_b_create_users_and_login_with_exsting_user_with_wrong_password(self):
 		temp = sample(self.driver)
 		if temp==1:
 			text = LoginDifferentKindOfUser(self.driver, "coach", "password")
-			self.assertEqual(text, "Incorrect username or password",'Logging with the user that is not part of class')
 
+			self.assertEqual(text, "Incorrect username or password",'Logging with the user that is not part of class')
+			file.write("\n")
+			file.write("test_b_create_users_and_login_with_exsting_user_with_wrong_password is passed")
+			file.write("\n")
 	def test_c_start_with_capital_a(self):
 		self.driver.get("http://localhost:8008")
 		text = LoginDifferentKindOfUser(self.driver, "Admin", "password")
 		self.assertTrue(text, "Incorrect username or password")
+		file.write("\n")
+		file.write("test_c_start_with_capital_a is passed")
+		file.write("\n")
 
 	def test_d_admin_username_in_capital(self):
 		self.driver.get("http://localhost:8008")
 		text = LoginDifferentKindOfUser(self.driver, "ADMIN", "password")
 		self.assertTrue(text, "Incorrect username or password")
-	
+		file.write("\n")
+		file.write("test_d_admin_username_in_capital is passed")
+		file.write("\n")
 	def test_e_login_with_non_exsting_user(self):
 		self.driver.get("http://localhost:8008")
 		text = LoginDifferentKindOfUser(self.driver, "nalanda","lee")
 		self.assertEqual(text, "Incorrect username or password",'Logging with the user that is not part of class')
-	
+		file.write("\n")
+		file.write("test_e_login_with_non_exsting_user is passed")
+		file.write("\n")
 	def tearDown(self):
 		self.driver.close()
 
@@ -58,6 +78,9 @@ class KolibriTestingClass(unittest.TestCase):
 		url = self.driver.current_url
 		if "setup_wizard" in url:
 			print("You need to setup Device owner account")
+			file.write("\n")
+			file.write("test_a_delete_class :: You need to setup Device owner account")
+			file.write("\n")
 		else:
 			wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
 			sheet_user = wb.get_sheet_by_name('user')
@@ -78,9 +101,15 @@ class KolibriTestingClass(unittest.TestCase):
 							self.driver.find_element_by_xpath("//span[contains(text(), 'Delete Class')]").click()
 							time.sleep(3)
 							self.assertEqual(False, text in self.driver.page_source)
+							file.write("\n")
+							file.write("test_a_delete_class is passed")
+							file.write("\n")
 							break
 				else:
 					print("Class not found")
+					file.write("\n")
+					file.write("test_a_delete_class :: Class not found")
+					file.write("\n")
 
 	def tearDown(self):
 		self.driver.close()
@@ -156,6 +185,9 @@ class KolibriTestingFacility(unittest.TestCase):
 		time.sleep(4)
 
 		print("Edit username facility working properly")
+		file.write("\n")
+		file.write("test_a_check_edit_username_facility is passed")
+		file.write("\n")
 
 	def test_b_check_edit_fullname_facility(self):
 		self.driver.get("http://localhost:8008")
@@ -216,7 +248,9 @@ class KolibriTestingFacility(unittest.TestCase):
 		time.sleep(5)
 		self.assertEqual(True, True)
 		print("Edit full name facility working properly")
-
+		file.write("\n")
+		file.write("test_b_check_edit_fullname_facility is passed")
+		file.write("\n")
 	def tearDown(self):
 		self.driver.close()
 
@@ -279,14 +313,22 @@ class KolibriTestingGroup(unittest.TestCase):
 						
 						SignOut(self.driver)
 						self.assertEqual(True, True)
-
+						file.write("\n")
+						file.write("test_a_create_group is passed")
+						file.write("\n")
 						break
 				
 			except Exception:
 				print("There is no student in class")
+				file.write("\n")
+				file.write("test_a_delete_class:: No student in the class")
+				file.write("\n")
 
 		else:
 			print("Enter valid classroom name")
+			file.write("\n")
+			file.write("test_a_delete_class :: Enter vaid classroom name")
+			file.write("\n")
 
 
 	def test_b_delete_group(self):
@@ -312,6 +354,9 @@ class KolibriTestingGroup(unittest.TestCase):
 			group_name = validate(group_name , "Enter group name to delete")
 			if group_name == "Ungrouped":
 				print("Sorry, You can not delete Ungrouped group")
+				file.write("\n")
+				file.write("test_b_delete_group :: Ungrouped group not able to delete")
+				file.write("\n")
 			else:
 				if group_name in self.driver.page_source:
 					temp = self.driver.find_elements_by_class_name("group-section")
@@ -340,16 +385,31 @@ class KolibriTestingGroup(unittest.TestCase):
 						if count == 0:
 							self.assertEqual(True, True)
 							print("Group deleted successfully")
+							file.write("\n")
+							file.write("test_b_delete_group is passed")
+							file.write("\n")
 						else:
 							self.assertEqual(True , False)
+							file.write("\n")
+							file.write("test_b_delete_group is failed")
+							file.write("\n")
 					else:
 						self.assertEqual(True, True)
 						print("Group deleted successfully")
+						file.write("\n")
+						file.write("test_b_delete_group is passed")
+						file.write("\n")
 				else:
 					print("%s not present in the class" %group_name)
 					self.assertEqual(True , True)
+					file.write("\n")
+					file.write("test_a_delete_class :: Class not found")
+					file.write("\n")
 		else:
 			print("Class is not present")
+			file.write("\n")
+			file.write("test_a_delete_class :: Class not present")
+			file.write("\n")
 
 	def tearDown(self):
 		self.driver.close()
@@ -444,6 +504,9 @@ class KolibriTestingExam(unittest.TestCase):
 							time.sleep(3)
 							self.assertEqual(True, True)
 							print("Exam Created and Assigned")
+							file.write("\n")
+							file.write("test_a_create_exam :: Exam created and assigned")
+							file.write("\n")
 							time.sleep(5)
 							LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 							time.sleep(6)
@@ -467,19 +530,35 @@ class KolibriTestingExam(unittest.TestCase):
 											j.click()
 									time.sleep(7)
 									print("Exam Given successfully")
+									file.write("\n")
+									file.write("test_a_create_exam is passed")
+									file.write("\n")
 									self.assertEqual(True, True)
 									break
 							if count == 0:
+								file.write("\n")
+								file.write("test_a_create_exam ::Exam is not given to this learner")
+								file.write("\n")
 								print("Exam is not given for this learner")
 							break
 
 				except Exception:
 					print("Element not found")
+					file.write("\n")
+					file.write("test_a_create_exam ::Element not found")
+					file.write("\n")
+
 			else:
 				print("Class not present")
+				file.write("\n")
+				file.write("test_a_create_exam ::Class not found")
+				file.write("\n")				
 				self.assertEqual(True, True)
 		else:
 			print("Sorry, you login as a Device owner. Please login with admin or coach")
+			file.write("\n")
+			file.write("test_a_create_exam :: Sorry, you login as a Device owner. Please login with admin or coach")
+			file.write("\n")
 			self.assertEqual(True, True)
 
 
@@ -519,6 +598,9 @@ class KolibriTestingExam(unittest.TestCase):
 
 					if count == 0:
 						print("Exam is not available to delete")
+						file.write("\n")
+						file.write("test_b_delete_exam :: Exam not available to delete")
+						file.write("\n")
 						self.assertEqual(True, True)
 					else:
 						col = temp[i].find_elements(By.TAG_NAME, "td")[3]
@@ -530,7 +612,9 @@ class KolibriTestingExam(unittest.TestCase):
 						time.sleep(5)
 				except Exception:
 					print("Element not found")
-
+					file.write("\n")
+					file.write("test_b_delete_exam :: Element not found")
+					file.write("\n")
 				temp = self.driver.find_elements_by_tag_name("tr")
 				if len(temp) != 0:
 					temp.pop(0)
@@ -541,23 +625,38 @@ class KolibriTestingExam(unittest.TestCase):
 							break
 					if count == 0:
 						print("After deleting exam, Exam still there")
+						file.write("\n")
+						file.write("test_b_delete_exam :: Still exam is there")
+						file.write("\n")
 						self.assertEqual(True, True)
 
 					else:
 						self.assertEqual(True, True)
+						file.write("\n")
+						file.write("test_b_delete_exam is passed")
+						file.write("\n")
 						print("Exam deleted successfully.")
 						SignOut(self.driver)
 				else:
 						self.assertEqual(True, True)
+						file.write("\n")
+						file.write("test_b_delete_exam is passed")
+						file.write("\n")
 						print("Exam deleted successfully.")
 						SignOut(self.driver)
 
 
 			else:
 				print("Class not present")
+				file.write("\n")
+				file.write("test_b_delete_exam :: Class not present")
+				file.write("\n")
 				self.assertEqual(True, True)
 		else:
 			print("Sorry, you login as a Device owner. Please login with admin or coach")
+			file.write("\n")
+			file.write("test_b_delete_exam :: Sorry, you login as a Device owner. Please login with admin or coach")
+			file.write("\n")
 			self.assertEqual(True, True)
 	def tearDown(self):
 		self.driver.close()
@@ -599,6 +698,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 			time.sleep(5)
 			if "That ID was not found on our server." in self.driver.page_source:
 				print("Your channel ID is not valid")
+				file.write("\n")
+				file.write(" test_a_import_channel_from_internet :: ID is not present on server")
+				file.write("\n")
 				self.assertEqual(False, False)
 			else:
 				time.sleep(15)
@@ -607,6 +709,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 					self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 					time.sleep(2)
 					print("Channel imported successfully")
+					file.write("\n")
+					file.write(" test_a_import_channel_from_internet is passed")
+					file.write("\n")
 				else:
 					time.sleep(45)
 					if "Finished!" in self.driver.page_source:
@@ -614,9 +719,18 @@ class KolibriTestingImportExport(unittest.TestCase):
 						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 						time.sleep(2)
 						print("Channel imported successfully")
+						file.write("\n")
+						file.write("test_a_import_channel_from_internet is passed")
+						file.write("\n")
 					else:
 						print("You have very slow internet speed, Check import by your own or You are not connected to the Internet")
+						file.write("\n")
+						file.write("test_a_import_channel_from_internet :: You have very slow internet speed, Check import by your own or You are not connected to the Internet")
+						file.write("\n")
 		except Exception:
+			file.write("\n")
+			file.write("test_a_import_channel_from_internet ::Server is not responding")
+			file.write("\n")
 			print("Server is not responding")
 
 	def test_b_import_channel_from_localdrive(self):
@@ -648,6 +762,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 				path = validate(path, "Enter path of local channel")
 				if path not in self.driver.page_source:
 					print("Please Enter correct path or connect External drive to the server")
+					file.write("\n")
+					file.write("test_b_import_channel_from_localdrive :: Please Enter correct path or connect External drive to the server")
+					file.write("\n")
 				else:
 					count = 1
 			else: 
@@ -659,6 +776,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 				time.sleep(15)
 				if "Finished!" in self.driver.page_source:
 					print("Channel Imported successfully")
+					file.write("\n")
+					file.write("test_b_import_channel_from_localdrive is passed")
+					file.write("\n")
 					time.sleep(2)
 					self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 					time.sleep(2)
@@ -667,15 +787,25 @@ class KolibriTestingImportExport(unittest.TestCase):
 					time.sleep(50)
 					if "Finished!" in self.driver.page_source:
 						print("Channel Imported successfully")
+						file.write("\n")
+						file.write("test_b_import_channel_from_localdrive is passed")
+						file.write("\n")
 						time.sleep(2)
 						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 						time.sleep(2)
 						self.assertEqual(True, True)
 					else:
 						print("Please check this feature manually")
+						file.write("\n")
+						file.write("test_b_import_channel_from_localdrive :: Please check this feature manually")
+						file.write("\n")
 						self.assertEqual(True, False)
 		except Exception:
 			print("Server is not responding")
+			file.write("\n")
+			file.write("test_b_import_channel_from_localdrive :: Server is not responding")
+			file.write("\n")
+
 
 	def test_c_export_channel_to_localdrive(self):
 		self.driver.get("http://localhost:8008")
@@ -688,6 +818,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(4)
 		if "No channels installed" in self.driver.page_source:
 			print("No channels installed in your system")
+			file.write("\n")
+			file.write("test_c_export_channel_to_localdrive :: No channels installed")
+			file.write("\n")
 		else:
 			try:
 				self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
@@ -706,6 +839,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 					path = validate(path, "Enter path of local channel")
 					if path not in self.driver.page_source:
 						print("Please Enter correct path or connect External drive to the server")
+						file.write("\n")
+						file.write("test_c_export_channel_to_localdrive :: Please Enter correct path or connect External drive to the server")
+						file.write("\n")
 					else:
 						count = 1
 				else: 
@@ -718,18 +854,31 @@ class KolibriTestingImportExport(unittest.TestCase):
 					if "Finished!" in self.driver.page_source:
 						self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
 						print("Channel Exported successfully")
+						file.write("\n")
+						file.write("test_c_export_channel_to_localdrive is passed")
+						file.write("\n")
 						self.assertEqual(True, True)
 					else:
 						time.sleep(50)
 						if "Finished!" in self.driver.page_source:
 							self.driver.find_element_by_xpath("//span[contains(text(), 'Close')]").click()
+							file.write("\n")
+							file.write("test_c_export_channel_to_localdrive is passed")
+							file.write("\n")
 							print("Channel Exported successfully")
 							self.assertEqual(True, True)
 						else:
+							file.write("\n")
+							file.write("test_c_export_channel_to_localdrive :: Please check this feature manually")
+							file.write("\n")
 							print("Please check this feature manually")
 							self.assertEqual(True, False)
 			except Exception:
 				print("Server is not responding")			
+				file.write("\n")
+				file.write("test_c_export_channel_to_localdrive :: Server not responding")
+				file.write("\n")
+
 
 	def test_d_delete_channel(self):
 		self.driver.get("http://localhost:8008")
@@ -742,6 +891,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 		time.sleep(4)
 		if "No channels installed" in self.driver.page_source:
 			print("No channels installed in your system")
+			file.write("\n")
+			file.write("test_d_delete_channel :: No channel installed")
+			file.write("\n")
 		else:
 			channel_name = getText("Enter channel name")
 			channel_name = validate(channel_name, "Enter channel name")
@@ -760,12 +912,21 @@ class KolibriTestingImportExport(unittest.TestCase):
 						break
 				if channel_name in self.driver.page_source:
 					print("Channel delete feature is not working properly")
+					file.write("\n")
+					file.write("test_d_delete_channel :: Channel delete feature not working properly")
+					file.write("\n")
 					self.assertEqual(True, False)
 				else:
 					self.assertEqual(True, True)
 					print("Channel Deleted successfully")
+					file.write("\n")
+					file.write("test_d_delete_channel is passed")
+					file.write("\n")
 			else:
 				print("%s is not present" %channel_name)
+				file.write("\n")
+				file.write("test_d_delete_channel :: channel not present")
+				file.write("\n")
 				self.assertEqual(True, True)
 
 	def tearDown(self):
@@ -807,10 +968,16 @@ class KolibriTestingLearnTab(unittest.TestCase):
 					temp = int(temp.replace(',',''))
 					if points + 500 == temp:
 						print("Congratulations.! You have completed with mastery...")
+						file.write("\n")
+						file.write("test_a_exercise is passed with mastery")
+						file.write("\n")
 						self.assertEqual(True, True)
 						break
 					else:
 						print("Sorry, You have not completed mastery...")
+						file.write("\n")
+						file.write("test_a_exercise is passed without mastery")
+						file.write("\n")
 						self.assertEqual(True, True)
 						break
 				else:
@@ -819,7 +986,9 @@ class KolibriTestingLearnTab(unittest.TestCase):
 
 		except Exception:
 			print("Error while loading")
-
+			file.write("\n")
+			file.write("test_a_exercise :: Error while loading")
+			file.write("\n")
 
 	def test_b_video(self):
 		self.driver.get("http://localhost:8008")
@@ -840,7 +1009,7 @@ class KolibriTestingLearnTab(unittest.TestCase):
 		time.sleep(4)
 		
 		for i in range(1,10):
-			print(i)
+			#print(i)
 			timeout = int(sheet_exercise['B%s' %i].value)
 			path = str(sheet_exercise['A%s' %i].value)
 			time.sleep(2)
@@ -859,17 +1028,26 @@ class KolibriTestingLearnTab(unittest.TestCase):
 						print("Congratulations.! You have completed with mastery...")
 						self.assertTrue(True, True)
 						print("Passed")
+						file.write("\n")
+						file.write("test_b_video is passed with mastery")
+						file.write("\n")
 						break
 					else:
 						print("Sorry, You have not completed mastery...")
 						self.assertTrue(True, True)
 						print("Passed")
+						file.write("\n")
+						file.write("test_b_video is passed without mastery")
+						file.write("\n")
 						break
 				else:
 					self.driver.find_element_by_xpath("//h3[contains(text(), '%s')]" %path).click()
 					time.sleep(timeout)
 			except Exception:
 				print("Something wrong going on")
+				file.write("\n")
+				file.write("test_b_video :: Something went wrong")
+				file.write("\n")
 
 
 	def tearDown(self):
