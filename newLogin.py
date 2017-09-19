@@ -7,12 +7,9 @@ import time
 import sys
 import os
 from tkinter import *
+import openpyxl
 
-user = [{"admin": "password"},
-		{"pm": "sc"},
-		{"coach": "sc"},
-		{"learner":"sc"},
-		{"student": "sc"}]
+
 
 class KolibriTesting(unittest.TestCase):
 	def setUp(self):
@@ -62,7 +59,9 @@ class KolibriTestingClass(unittest.TestCase):
 		if "setup_wizard" in url:
 			print("You need to setup Device owner account")
 		else:
-			LoginDifferentKindOfUser(self.driver, "admin","password")
+			wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+			sheet_user = wb.get_sheet_by_name('user')
+			LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 			time.sleep(7)
 			text = getText('enter classroom name::')
 			if len(text)== 0:
@@ -93,7 +92,9 @@ class KolibriTestingFacility(unittest.TestCase):
 
 	def test_a_check_edit_username_facility(self):
 		self.driver.get("http://localhost:8008")
-		LoginDifferentKindOfUser(self.driver, "admin","password")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(2)
 		self.driver.find_element_by_xpath('//a[contains(@href,"#/facilities")]').click()
 		time.sleep(3)
@@ -105,7 +106,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		SignOut(self.driver)
 		time.sleep(4)
 		try:
-			LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0])
+			LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 			time.sleep(5)
 			self.driver.find_element_by_xpath("//button[@type='submit']").click()
 			time.sleep(2)
@@ -118,7 +119,7 @@ class KolibriTestingFacility(unittest.TestCase):
 
 		self.driver.find_element_by_xpath("//input[@type='text']").clear()
 		time.sleep(3)
-		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[4].keys()[0])
+		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(str(sheet_user['A6'].value))
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'Save changes')]").click()
 		time.sleep(4)
@@ -136,7 +137,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'exit_to_app')]").click()
 		time.sleep(5)
-		LoginDifferentKindOfUser(self.driver, user[4].keys()[0], user[4].values()[0])
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A6'].value), str(sheet_user['B6'].value))
 		time.sleep(8)
 		temp = self.driver.title
 		self.assertTrue(True, "Learn" in temp)
@@ -149,7 +150,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		time.sleep(2)
 		self.driver.find_element_by_xpath("//input[@type='text']").clear()
 		time.sleep(4)
-		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(user[3].keys()[0])
+		self.driver.find_element_by_xpath("//input[@type='text']").send_keys(str(sheet_user['A5'].value))
 		time.sleep(3)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'Save changes')]").click()
 		time.sleep(4)
@@ -158,7 +159,9 @@ class KolibriTestingFacility(unittest.TestCase):
 
 	def test_b_check_edit_fullname_facility(self):
 		self.driver.get("http://localhost:8008")
-		LoginDifferentKindOfUser(self.driver, "admin","password")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(2)
 		self.driver.find_element_by_xpath('//a[contains(@href,"#/facilities")]').click()
 		time.sleep(3)
@@ -177,7 +180,7 @@ class KolibriTestingFacility(unittest.TestCase):
 		SignOut(self.driver)
 		time.sleep(4)
 		try:
-			LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0])
+			LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 			time.sleep(5)
 			self.driver.find_element_by_xpath("//button[@type='submit']").click()
 			time.sleep(2)
@@ -225,14 +228,16 @@ class KolibriTestingGroup(unittest.TestCase):
 	def test_a_create_group(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[2].keys()[0], user[2].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value))
+
 		time.sleep(7)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
 		time.sleep(2)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'assessment')]").click()
 		time.sleep(3)
-		class_name = getText("Enter class name")
-		class_name = validate(class_name, "Enter class name")
+		class_name = str(sheet_user['D2'].value)
 		if class_name in self.driver.page_source:
 			time.sleep(2)
 			self.driver.find_element_by_xpath("//a[contains(text(), '%s')]" %class_name).click()
@@ -287,14 +292,15 @@ class KolibriTestingGroup(unittest.TestCase):
 	def test_b_delete_group(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[1].keys()[0], user[1].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value))
 		time.sleep(7)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
 		time.sleep(2)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'assessment')]").click()
 		time.sleep(3)
-		class_name = getText("Enter class name")
-		class_name = validate(class_name, "Enter class name")
+		class_name = str(sheet_user['D2'].value)
 		if class_name in self.driver.page_source:
 			time.sleep(2)
 			self.driver.find_element_by_xpath("//a[contains(text(), '%s')]" %class_name).click()
@@ -356,7 +362,11 @@ class KolibriTestingExam(unittest.TestCase):
 	def test_a_create_exam(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[1].keys()[0], user[1].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		sheet_channel = wb.get_sheet_by_name('channel')
+		sheet_exam = wb.get_sheet_by_name('exam')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value))
 		time.sleep(7)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
 		time.sleep(2)
@@ -365,8 +375,7 @@ class KolibriTestingExam(unittest.TestCase):
 
 		text = "Signed in as device owner"
 		if text not in self.driver.page_source:
-			class_name = getText("Enter class name")
-			class_name = validate(class_name, "Enter class name")
+			class_name = str(sheet_user['D2'].value)
 			time.sleep(2)
 			if class_name in self.driver.page_source:
 				try:
@@ -378,8 +387,7 @@ class KolibriTestingExam(unittest.TestCase):
 					time.sleep(4)
 					self.driver.find_element_by_css_selector(".ui-select__display-value.is-placeholder").click()
 					time.sleep(4)
-					channel_name = getText("Enter channel name")
-					channel_name = validate(channel_name, "Enter channel name")
+					channel_name = str(sheet_exam['C1'].value)
 					if channel_name not in self.driver.page_source:
 						channel_name = getText("Enter channel name")
 						channel_name = validate(channel_name, "Enter channel name")
@@ -392,8 +400,7 @@ class KolibriTestingExam(unittest.TestCase):
 					time.sleep(4)
 					self.driver.find_element_by_xpath("//span[contains(text(), 'Create exam')]").click()
 					time.sleep(7)
-					exam_name = getText("Enter exam name")
-					exam_name = validate(exam_name, "Enter exam name")
+					exam_name = str(sheet_exam['A1'].value)
 					time.sleep(3)
 					self.driver.find_element_by_xpath("//input[@type='text']").clear()
 					time.sleep(2)
@@ -415,7 +422,7 @@ class KolibriTestingExam(unittest.TestCase):
 					time.sleep(4)
 					self.driver.find_element_by_xpath("//input[@type='number']").clear()
 					time.sleep(2)
-					self.driver.find_element_by_xpath("//input[@type='number']").send_keys(5)
+					self.driver.find_element_by_xpath("//input[@type='number']").send_keys(int(sheet_exam['B1'].value))
 					time.sleep(2)
 					self.driver.find_element_by_xpath("//input[@type='checkbox']").click()
 					time.sleep(15)
@@ -438,7 +445,7 @@ class KolibriTestingExam(unittest.TestCase):
 							self.assertEqual(True, True)
 							print("Exam Created and Assigned")
 							time.sleep(5)
-							LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0] )
+							LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 							time.sleep(6)
 							self.driver.find_element_by_xpath("//span[contains(text(), 'assignment_late')]").click()
 							time.sleep(3)
@@ -447,7 +454,6 @@ class KolibriTestingExam(unittest.TestCase):
 							count = 0
 							for i in temp:
 								t = i.find_element(By.TAG_NAME, "h2").text
-								print(t)
 								if t == exam_name:
 									count = 1
 									i.find_element(By.TAG_NAME, "span").click()
@@ -480,7 +486,9 @@ class KolibriTestingExam(unittest.TestCase):
 	def test_b_delete_exam(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[1].keys()[0], user[1].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')		
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A3'].value), str(sheet_user['B3'].value))
 		time.sleep(7)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'menu')]").click()
 		time.sleep(2)
@@ -489,8 +497,7 @@ class KolibriTestingExam(unittest.TestCase):
 
 		text = "Signed in as device owner"
 		if text not in self.driver.page_source:
-			class_name = getText("Enter class name")
-			class_name = validate(class_name, "Enter class name")
+			class_name = str(sheet_user['D2'].value)
 			time.sleep(2)
 			if class_name in self.driver.page_source:
 				try:
@@ -499,8 +506,7 @@ class KolibriTestingExam(unittest.TestCase):
 					self.driver.find_element_by_xpath("//span[contains(text(), 'assignment_late')]").click()
 					time.sleep(4)
 		
-					exam_name = getText("Enter already exist exam name")
-					exam_name = validate(exam_name, "Enter already exist exam name")
+					exam_name = str(sheet_user['G2'].value)
 					time.sleep(3)
 					count = 0
 					temp = self.driver.find_elements_by_tag_name("tr")
@@ -564,8 +570,12 @@ class KolibriTestingImportExport(unittest.TestCase):
 
 	def test_a_import_channel_from_internet(self):
 		self.driver.get("http://localhost:8008")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_channel = wb.get_sheet_by_name('channel')
+		sheet_user = wb.get_sheet_by_name('user')
+
 		time.sleep(7)
-		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
@@ -581,8 +591,7 @@ class KolibriTestingImportExport(unittest.TestCase):
 			time.sleep(4)
 			self.driver.find_element_by_xpath("//input[@type='text']").clear()
 			time.sleep(2)
-			channel_id = getText("Enter channel ID which you want to import from internet")
-			channel_id = validate(channel_id, "Enter channel ID which you want to import from internet")
+			channel_id = str(sheet_channel['A1'].value)
 			time.sleep(2)
 			self.driver.find_element_by_xpath("//input[@type='text']").send_keys(channel_id)
 			time.sleep(2)
@@ -606,14 +615,16 @@ class KolibriTestingImportExport(unittest.TestCase):
 						time.sleep(2)
 						print("Channel imported successfully")
 					else:
-						print("You have very slow internet speed, Check import by your own")
+						print("You have very slow internet speed, Check import by your own or You are not connected to the Internet")
 		except Exception:
 			print("Server is not responding")
 
 	def test_b_import_channel_from_localdrive(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(7)
-		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
@@ -669,7 +680,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 	def test_c_export_channel_to_localdrive(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(7)
-		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
@@ -721,7 +734,9 @@ class KolibriTestingImportExport(unittest.TestCase):
 	def test_d_delete_channel(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(7)
-		LoginDifferentKindOfUser(self.driver, "admin", "password")
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A2'].value), str(sheet_user['B2'].value))
 		time.sleep(8)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'view_module')]").click()
 		time.sleep(4)
@@ -765,161 +780,96 @@ class KolibriTestingLearnTab(unittest.TestCase):
 	def test_a_exercise(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		sheet_exercise = wb.get_sheet_by_name('exercise')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 		time.sleep(7)
-		exercise = """M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"""
-		folder = """M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"""
-		video = """M21 3H3c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5a2 2 0 0 0-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7z"""
+		points = self.driver.find_element_by_css_selector(".description-value").text
+		points = str(points)
+		points = int(points.replace(',',''))
+		self.driver.find_element_by_xpath("//span[contains(text(), 'apps')]").click()
+		time.sleep(4)
+		self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %str(sheet_exercise['A15'].value)).click()
+		time.sleep(5)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'folder')]").click()
 		time.sleep(4)
-		self.driver.find_element_by_xpath("//span[contains(text(), 'apps')]").click()
-		time.sleep(2)
-		text = getText("Enter channel name")
-		time.sleep(2)
-		self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %text).click()
-		time.sleep(3)
-		counter = 5
 		try:
-			for p in range(0,counter):
+			for i in range(1,10):
+				timeout = int(sheet_exercise['B%s' %i].value)
+				path = str(sheet_exercise['A%s' %i].value)
 				time.sleep(2)
-				count = 0
-				if exercise not in self.driver.page_source and folder not in self.driver.page_source:
-					time.sleep(3)
-					self.driver.find_element_by_xpath("//span[contains(text(), 'folder')]").click()
-					counter = counter + 5
-					time.sleep(3)
-				elif exercise not in self.driver.page_source:
-					text = getText("Enter partial text of the folder")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					print("Not found")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-							print(t)
-							i.click()
-							time.sleep(4)
-							break
-				elif exercise in self.driver.page_source and folder in self.driver.page_source:
-					print("Mixed found")
-					text = getText("Enter partial text")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-							print(t)
-							time.sleep(3)
-							i.click()
-
-							if folder not in self.driver.page_source and exercise not in self.driver.page_source and video not in self.driver.page_source:
-								count = 1
-								print(t)
-								time.sleep(100)
-
-								break
-							else:
-								time.sleep(6)
+				if timeout > 8:
+					self.driver.find_element_by_xpath("//h3[contains(text(), '%s')]" %path).click()
+					time.sleep(timeout)
+					temp = self.driver.find_element_by_css_selector(".description-value").text
+					temp = str(temp)
+					temp = int(temp.replace(',',''))
+					if points + 500 == temp:
+						print("Congratulations.! You have completed with mastery...")
+						self.assertEqual(True, True)
+						break
+					else:
+						print("Sorry, You have not completed mastery...")
+						self.assertEqual(True, True)
+						break
 				else:
-					print("found")
-					text = getText("Enter partial text")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-								count = 1
-								print(t)
-								time.sleep(3)
-								i.click()
-								time.sleep(100)
-								break
-				if count == 1:
-					self.assertEqual(True, True)
-					break
+					self.driver.find_element_by_xpath("//h3[contains(text(), '%s')]" %path).click()
+					time.sleep(timeout)
+
 		except Exception:
-			print("Something going wrong")
+			print("Error while loading")
 
 
 	def test_b_video(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
-		LoginDifferentKindOfUser(self.driver, user[3].keys()[0], user[3].values()[0])
+		wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+		sheet_user = wb.get_sheet_by_name('user')
+		sheet_exercise = wb.get_sheet_by_name('video')
+		LoginDifferentKindOfUser(self.driver, str(sheet_user['A5'].value), str(sheet_user['B5'].value))
 		time.sleep(7)
-		exercise = """M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"""
-		folder = """M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"""
-		video = """M21 3H3c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5a2 2 0 0 0-2-2zm0 14H3V5h18v12zm-5-6l-7 4V7z"""
+		points = self.driver.find_element_by_css_selector(".description-value").text
+		points = str(points)
+		points = int(points.replace(',',''))
+		self.driver.find_element_by_xpath("//span[contains(text(), 'apps')]").click()
+		time.sleep(4)
+		self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %str(sheet_exercise['A15'].value)).click()
+		time.sleep(5)
 		self.driver.find_element_by_xpath("//span[contains(text(), 'folder')]").click()
 		time.sleep(4)
-		self.driver.find_element_by_xpath("//span[contains(text(), 'apps')]").click()
-		time.sleep(2)
-		text = getText("Enter channel name")
-		time.sleep(2)
-		self.driver.find_element_by_xpath("//div[contains(text(), '%s')]" %text).click()
-		time.sleep(3)
-		counter = 5
-		try:
-			for p in range(0,counter):
-				time.sleep(2)
-				count = 0
-				if video not in self.driver.page_source and folder not in self.driver.page_source:
-					time.sleep(3)
-					self.driver.find_element_by_xpath("//span[contains(text(), 'folder')]").click()
-					counter = counter + 5
-					time.sleep(3)
-				elif video not in self.driver.page_source:
-					text = getText("Enter partial text of the folder")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					print("Not found")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-							print(t)
-							i.click()
-							time.sleep(4)
-							break
-				elif video in self.driver.page_source and folder in self.driver.page_source:
-					print("Mixed found")
-					text = getText("Enter partial text")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-							print(t)
-							time.sleep(3)
-							i.click()
-
-							if folder not in self.driver.page_source and exercise not in self.driver.page_source and video not in self.driver.page_source:
-								count = 1
-								print(t)
-								self.driver.find_element_by_xpath("//span[contains(text(), 'Play')]").click()
-
-								time.sleep(240)
-
-								break
-							else:
-								time.sleep(6)
+		
+		for i in range(1,10):
+			print(i)
+			timeout = int(sheet_exercise['B%s' %i].value)
+			path = str(sheet_exercise['A%s' %i].value)
+			time.sleep(2)
+			try:
+				if timeout > 8:
+					self.driver.find_element_by_xpath("//h3[contains(text(), '%s')]" %path).click()
+					time.sleep(5)
+					self.driver.find_element_by_xpath("//span[contains(text(), 'Play')]").click()
+					time.sleep(5)
+					time.sleep(timeout)
+					temp = self.driver.find_element_by_css_selector(".description-value").text
+					temp = str(temp)
+					temp = int(temp.replace(',',''))
+					total = points + 500					
+					if total == temp:
+						print("Congratulations.! You have completed with mastery...")
+						self.assertTrue(True, True)
+						print("Passed")
+						break
+					else:
+						print("Sorry, You have not completed mastery...")
+						self.assertTrue(True, True)
+						print("Passed")
+						break
 				else:
-					print("found")
-					text = getText("Enter partial text")
-					temp = self.driver.find_elements(By.TAG_NAME, "h3")
-					for i in temp:
-						t = i.text
-						if t.find(text) != -1:
-								count = 1
-								print(t)
-								time.sleep(3)
-								i.click()
-								time.sleep(3)
-								self.driver.find_element_by_xpath("//span[contains(text(), 'Play')]").click()
-								time.sleep(240)
-								break
-				if count == 1:
-					self.assertEqual(True, True)
-					break
-
-		except Exception:
-			print("Something going wrong")
-
-
-
+					self.driver.find_element_by_xpath("//h3[contains(text(), '%s')]" %path).click()
+					time.sleep(timeout)
+			except Exception:
+				print("Something wrong going on")
 
 
 	def tearDown(self):
