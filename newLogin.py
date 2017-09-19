@@ -9,15 +9,26 @@ import os
 from tkinter import *
 import openpyxl
 from time import gmtime, strftime
+
+# open this file to write logs about test cases into it.
 file = open("selenium.log", "a")
 file.write("\n\n")
 file.write(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 file.write("\n")
+# take browser name from excel sheet to check each browser response with kolibri
+wb = openpyxl.load_workbook('/home/kolibri/Desktop/selenium/excel.xlsx')
+sheet_browser = wb.get_sheet_by_name('browser')
+browser_name = str(sheet_browser['A1'].value)
 
-
+# Login and user creation test cases
 class KolibriTesting(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 	def test_a_testing_server_is_started(self):
 		r = requests.get("http://localhost:8008")
@@ -68,10 +79,15 @@ class KolibriTesting(unittest.TestCase):
 		self.driver.close()
 
 
+# Class deletion test case
 class KolibriTestingClass(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
-
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 	def test_a_delete_class(self):
 		self.driver.get("http://localhost:8008")
 		time.sleep(3)
@@ -115,9 +131,15 @@ class KolibriTestingClass(unittest.TestCase):
 		self.driver.close()
 
 
+# Facility testing test cases
 class KolibriTestingFacility(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 	def test_a_check_edit_username_facility(self):
 		self.driver.get("http://localhost:8008")
@@ -255,9 +277,15 @@ class KolibriTestingFacility(unittest.TestCase):
 		self.driver.close()
 
 
+# Group creation and group deletion
 class KolibriTestingGroup(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 	def test_a_create_group(self):
 		self.driver.get("http://localhost:8008")
@@ -415,9 +443,15 @@ class KolibriTestingGroup(unittest.TestCase):
 		self.driver.close()
 
 
+# Exam creation and deletion
 class KolibriTestingExam(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 	def test_a_create_exam(self):
 		self.driver.get("http://localhost:8008")
@@ -662,10 +696,15 @@ class KolibriTestingExam(unittest.TestCase):
 		self.driver.close()
 
 
-
+# Channel import and export test cases
 class KolibriTestingImportExport(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 	def test_a_import_channel_from_internet(self):
 		self.driver.get("http://localhost:8008")
@@ -933,9 +972,15 @@ class KolibriTestingImportExport(unittest.TestCase):
 		self.driver.close()
 
 
+# Learn tab test cases
 class KolibriTestingLearnTab(unittest.TestCase):
 	def setUp(self):
-		self.driver = webdriver.Firefox()
+		if browser_name == "firefox":
+			self.driver = webdriver.Firefox()
+		elif browser_name == "chrome":
+			self.driver = webdriver.Chrome()
+		elif browser_name == "ie":
+			self.driver = webdriver.Ie()
 
 
 	def test_a_exercise(self):
